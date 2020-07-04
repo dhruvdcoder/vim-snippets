@@ -145,13 +145,17 @@ def format_arg(arg, style):
 		return "%s : TODO" % arg
 
 
-def format_return(style):
+def format_return(style, type_=None):
+	if type_ is None:
+		type_text = 'TODO'
+	else:
+		type_text = type_
 	if style == DOXYGEN:
-		return "@return: TODO"
+		return "@return: %s" % type_text
 	elif style in (NORMAL, SPHINX, JEDI):
-		return ":returns: TODO"
+		return ":returns: %s" % type_text
 	elif style == GOOGLE:
-		return "Returns: TODO"
+		return "Returns: (%s)" % type_text
 
 
 def write_docstring_args(args, snip):
@@ -252,7 +256,11 @@ def write_function_docstring(t, snip):
 		snip += '-------'
 		snip += 'TODO'
 	else:
-		snip += format_return(style)
+		try:
+			type_ = t[6]
+			snip += format_return(style, type_)
+		except:
+			snip += format_return(style)
 	snip.rv += '\n' + snip.mkline('', indent='')
 	snip += triple_quotes(snip)
 
@@ -505,7 +513,7 @@ endsnippet
 snippet def "function with docstrings" b
 def ${1:function}(`!p
 if snip.indent:
-	snip.rv = 'self' + (", " if len(t[2]) else "")`${2:arg1}):
+	snip.rv = 'self' + (", " if len(t[2]) else "")`${2:arg1}) -> ${6:None}:
 	`!p snip.rv = triple_quotes(snip)`${4:TODO: Docstring for $1.}`!p
 write_function_docstring(t, snip) `
 	${5:${VISUAL:pass}}
@@ -541,6 +549,9 @@ snippet from "from module import name" b
 from ${1:module} import ${2:Stuff}
 endsnippet
 
+snippet 'from typing' "Import essentials from typing" b
+from typing import List, Tuple, Union, Dict, Any, Optional
+endsnippet
 
 ##############
 # PROPERTIES #
@@ -719,5 +730,14 @@ snippet pmdoc "pocoo style module doc string" b
 """
 $0
 endsnippet
+
+
+######################
+#     Argprase       #
+######################
+snippet parser.a "add argrument to parser"
+parser.add_argument("--${1:argname}", required=${2:False}, type=${3:str}, help="${4:TODO } (default:${5:None})")
+endsnippet
+
 
 # vim:ft=snippets:
